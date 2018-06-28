@@ -2,21 +2,18 @@ var express = require('express');
 var router = express.Router();
 var Rectangle = require('./../models/rectangle');
 var fetch = require("node-fetch");
+const parent = require('./../utils/sparqlConstants').sparqlParent;
+const child = require('./../utils/sparqlConstants').sparqlChild;
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-
-
-  const square = new Rectangle(20, 10);
-
-  console.log(square); // 100
-
+  
   const endpointUrl = 'https://query.wikidata.org/sparql',
-      sparqlQuery = `#Cats
-SELECT ?item ?itemLabel WHERE {
-  ?item wdt:P136 wd:Q146.
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-}`,
+      sparqlQuery = `#Mathematics
+      SELECT ?field ?fieldLabel WHERE {
+        wd:Q395 ` + parent.instanceOf + ` ?field .
+        SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+      }`,
       fullUrl = endpointUrl + '?query=' + encodeURIComponent( sparqlQuery ),
       headers = { 'Accept': 'application/sparql-results+json' };
 
