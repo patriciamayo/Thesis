@@ -10,7 +10,8 @@ router.get('/', function(req, res, next) {
 
   console.log(square); // 100
 
-  res.render('index', { title: 'Express' });
+  res.set('Content-Type', 'application/json');
+  res.send(square);
 });
 
 module.exports = router;
