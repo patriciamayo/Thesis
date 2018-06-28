@@ -1,3 +1,5 @@
+const endpointUrl = 'https://query.wikidata.org/sparql'
+
 const sparqlParent = {
     instanceOf: 'wdt:P31',
     partOf: 'wdt:P361',	
@@ -14,6 +16,7 @@ const sparqlChild = {
 }
 
 module.exports = {
-sparqlChild,
-sparqlParent
+    endpointUrl,
+    sparqlChild,
+    sparqlParent
 };
