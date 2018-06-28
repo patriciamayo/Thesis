@@ -5,50 +5,35 @@ const child = require('./../utils/sparqlConstants').sparqlChild;
 const graphNode = require('./../models/graphNode')
 const graphLink = require('./../models/graphLink')
 
-var fetchQuery = function(sparqlQuery) {
+var fetchQuery = (sparqlQuery) => {
     const fullUrl = endpointUrl + '?query=' + encodeURIComponent( sparqlQuery );
     const headers = { 'Accept': 'application/sparql-results+json' };
-
-    return fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => {
-    return json;
-    // const { head: { vars }, results } = json;
-    // for ( const result of results.bindings ) {
-    //     for ( const variable of vars ) {
-    //         console.log( '%s: %o', variable, result[variable] );
-    //     }
-    //     console.log( '---' );
-    // }
-    
-    });  
+    return fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => { return json;});
 };
 
-var generateQuery = function(wikidataIdentifier) {
-    return `#Mathematics
-    SELECT ?nodeID ?nodeLabel WHERE {
-      wd:Q395 ` + child.hasPart + ` ?nodeID .
+var generateQuery = (wikidataIdentifier, wikidataName) => {
+    return `#` + wikidataName + `
+    SELECT ?field ?fieldLabel WHERE {
+      `+ wikidataIdentifier + ` ` + child.hasPart + ` ?field .
       SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
     }`
 }
 
-var getD3Json = function(wikidataIdentifier, wikidataName) {
-    const sparqlQuery = generateQuery(wikidataIdentifier)
-    let genesisNode = new graphNode(wikidataIdentifier, wikidataName, 0)
-    let nodes = [genesisNode]
-    let links = []
-    fetchQuery(sparqlQuery).then((sparqlResults) => {
-        for ( const result of sparqlResults.bindings ) {
-            let node = new graphNode(result['nodeID'].value, result['nodeLabel'].value )
-            nodes.push(node)
-            let link = new graphLink(genesisNode.id, node.id, 'has part')
-            links.push(link)
-        }
-        console.log(nodes);
-        console.log(links);
-        return {nodes, links}
-    });
+var getD3Json = (wikidataIdentifier, wikidataName, sparqlJson) => {
+    const genesisNode = new graphNode('http://www.wikidata.org/entity/' + wikidataIdentifier, wikidataName, 0)
+    var graphNodes = [genesisNode]
+    var graphLinks = []
+    for ( const result of sparqlJson.results.bindings ) {
+        const node = new graphNode(result['field'].value, result['fieldLabel'].value, 1 )
+        graphNodes.push(node)
+        const link = new graphLink(genesisNode.id, node.id, 'has part')
+        graphLinks.push(link)
+    }
+    return {graphNodes, graphLinks}
 }
 
 module.exports = {
+    generateQuery,
     fetchQuery,
     getD3Json
 }

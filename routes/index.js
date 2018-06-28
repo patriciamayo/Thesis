@@ -6,22 +6,17 @@ const sparqlController = require('./sparqlQueryController.js');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-
-      const sparqlQuery = `#Mathematics
-      SELECT ?field ?fieldLabel WHERE {
-        wd:Q395 ` + child.hasPart + ` ?field .
-        SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-      }`
   
-  // sparqlController.fetchQuery(sparqlQuery).then((result) => {
-  //   res.set('Content-Type', 'application/json');
-  //   res.send(result);
-  // });
-
-  sparqlController.getD3Json('wd:Q395','Mathematics').then((result) => {
+  const wikiIdentifier = 'wd:Q395'
+  const wikiLabel = 'Mathematics'
+  const sparqlQuery = sparqlController.generateQuery(wikiIdentifier, wikiLabel)
+  sparqlController.fetchQuery(sparqlQuery).then((sparqlJson) => {
+    const d3Json = sparqlController.getD3Json('wd:Q395','Mathematics', sparqlJson )
     res.set('Content-Type', 'application/json');
-    res.send(result);
+    res.send(d3Json);
   });
+
+  
 });
 
 module.exports = router;
