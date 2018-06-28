@@ -13,7 +13,12 @@ router.get('/', function(req, res, next) {
         SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
       }`
   
-  sparqlController.fetchQuery(sparqlQuery).then((result) => {
+  // sparqlController.fetchQuery(sparqlQuery).then((result) => {
+  //   res.set('Content-Type', 'application/json');
+  //   res.send(result);
+  // });
+
+  sparqlController.getD3Json('wd:Q395','Mathematics').then((result) => {
     res.set('Content-Type', 'application/json');
     res.send(result);
   });
