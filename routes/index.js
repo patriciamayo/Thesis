@@ -11,9 +11,11 @@ router.get('/', function(req, res, next) {
   const wikiIdentifier = 'wd:Q395'
   const wikiLabel = 'Mathematics'
 
-  console.log(sparqlController.generateParentsQuery(wikiIdentifier, wikiLabel, sparqlConstants.sparqlParents))
+  //console.log(sparqlController.generateParentsQuery(wikiIdentifier, wikiLabel, sparqlConstants.sparqlParents))
 
-  const sparqlQuery = sparqlController.generateQuery(wikiIdentifier, wikiLabel)
+  //const sparqlQuery = sparqlController.generateQuery(wikiIdentifier, wikiLabel)
+  console.log( sparqlConstants.sparqlParents)
+  const sparqlQuery = sparqlController.generateParentsQuery(wikiIdentifier, wikiLabel, sparqlConstants.sparqlParents)
   sparqlController.fetchQuery(sparqlQuery).then((sparqlJson) => {
     const d3Json = sparqlController.getD3Json('wd:Q395','Mathematics', sparqlJson )
     res.set('Content-Type', 'application/json');

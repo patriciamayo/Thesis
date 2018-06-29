@@ -24,13 +24,13 @@ var generateChildrenQuery = (wikidataIdentifier, wikidataName) => {
     }`
 }
 
-var generateParentsQuery = (subjectIdentifier, subjectName) => {
+var generateParentsQuery = (subjectIdentifier, subjectName, propertiesArray) => {
     var selectQuery = ""
     var whereQuery = []
     console.log(sparqlConstants.sparqlParents)
-    sparqlConstants.sparqlParents.forEach(function(parentProperty) { 
-        selectQuery += "?" + parentProperty.title + " ?" + parentProperty.title + "Label "
-        whereQuery.push(" { " + subjectIdentifier + " " + parentProperty.value + " ?" + parentProperty.title + " .} ")
+    propertiesArray.forEach(function(property) { 
+        selectQuery += "?" + property.title + " ?" + property.title + "Label "
+        whereQuery.push(" { " + subjectIdentifier + " " + property.value + " ?" + property.title + " .} ")
     })
     return `#` + subjectName + `
     SELECT ` + selectQuery + ` WHERE {
@@ -71,7 +71,7 @@ var generateQuery = (wikidataIdentifier, wikidataName) => {
     }`
 }
 
-var getD3Json = (wikidataIdentifier, wikidataName, sparqlJson) => {
+var getD3JsonFormat = (wikidataIdentifier, wikidataName, sparqlJson) => {
     const genesisNode = new graphNode('http://www.wikidata.org/entity/' + wikidataIdentifier, wikidataName, 0)
     var graphNodes = [genesisNode]
     var graphLinks = []
@@ -79,6 +79,21 @@ var getD3Json = (wikidataIdentifier, wikidataName, sparqlJson) => {
         const node = new graphNode(result['field'].value, result['fieldLabel'].value, 1 )
         graphNodes.push(node)
         const link = new graphLink(genesisNode.id, node.id, 'has part')
+        graphLinks.push(link)
+    }
+    return {graphNodes, graphLinks}
+}
+
+var getD3Json = (wikidataIdentifier, wikidataName, sparqlJson) => {
+    const genesisNode = new graphNode('http://www.wikidata.org/entity/' + wikidataIdentifier, wikidataName, 0)
+    var graphNodes = [genesisNode]
+    var graphLinks = []
+    for ( const result of sparqlJson.results.bindings ) {
+        const keyValues = Object.keys(result)
+        const indexOfProperty = sparqlConstants.sparqlParents.map(property => property.title).indexOf(keyValues[0]);
+        const node = new graphNode(result[keyValues[0]].value, result[keyValues[1]].value, indexOfProperty + 6)
+        graphNodes.push(node)
+        const link = new graphLink(node.id, genesisNode.id, keyValues[0])
         graphLinks.push(link)
     }
     return {graphNodes, graphLinks}
