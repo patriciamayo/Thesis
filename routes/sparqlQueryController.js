@@ -4,7 +4,7 @@ const sparqlConstants = require('./../utils/sparqlConstants.js');
 const graphNode = require('./../models/graphNode')
 const graphLink = require('./../models/graphLink')
 
-const deep = 1
+const deep = 2
 
 var fetchQuery = (sparqlQuery) => {
     const fullUrl = endpointUrl + '?query=' + encodeURIComponent( sparqlQuery );
