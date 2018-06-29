@@ -3,12 +3,16 @@ var router = express.Router();
 const parent = require('./../utils/sparqlConstants').sparqlParent;
 const child = require('./../utils/sparqlConstants').sparqlChild;
 const sparqlController = require('./sparqlQueryController.js');
+const sparqlConstants = require('./../utils/sparqlConstants.js');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   
   const wikiIdentifier = 'wd:Q395'
   const wikiLabel = 'Mathematics'
+
+  console.log(sparqlController.generateParentsQuery(wikiIdentifier, wikiLabel, sparqlConstants.sparqlParents))
+
   const sparqlQuery = sparqlController.generateQuery(wikiIdentifier, wikiLabel)
   sparqlController.fetchQuery(sparqlQuery).then((sparqlJson) => {
     const d3Json = sparqlController.getD3Json('wd:Q395','Mathematics', sparqlJson )

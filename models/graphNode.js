@@ -1,7 +1,7 @@
 class GraphNode {
-    constructor(id, name, group) {
+    constructor(id, label, group) {
       this.id = id;
-      this.name = name;
+      this.label = label;
       this.group = group;
     }
 }
