@@ -1,25 +1,29 @@
 var express = require('express');
 var router = express.Router();
-const parent = require('./../utils/sparqlConstants').sparqlParent;
-const child = require('./../utils/sparqlConstants').sparqlChild;
 const sparqlController = require('./sparqlQueryController.js');
 const sparqlConstants = require('./../utils/sparqlConstants.js');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   
-  const wikiIdentifier = 'wd:Q395'
-  const wikiLabel = 'Mathematics'
+  const wikiIdentifier = 'wd:Q21198'
+  const wikiLabel = 'ComputerScience'
 
-  //console.log(sparqlController.generateParentsQuery(wikiIdentifier, wikiLabel, sparqlConstants.sparqlParents))
-
-  //const sparqlQuery = sparqlController.generateQuery(wikiIdentifier, wikiLabel)
-  console.log( sparqlConstants.sparqlParents)
-  const sparqlQuery = sparqlController.generateParentsQuery(wikiIdentifier, wikiLabel, sparqlConstants.sparqlParents)
-  sparqlController.fetchQuery(sparqlQuery).then((sparqlJson) => {
-    const d3Json = sparqlController.getD3Json('wd:Q395','Mathematics', sparqlJson )
-    res.set('Content-Type', 'application/json');
-    res.send(d3Json);
+  const sparqlParentQuery = sparqlController.generateQuery(wikiIdentifier, wikiLabel, sparqlConstants.sparqlParents)
+  const sparqlChildrenQuery = sparqlController.generateQuery(wikiIdentifier, wikiLabel, sparqlConstants.sparqlChildren)
+  sparqlController.fetchQuery(sparqlParentQuery).then((sparqlJson) => {
+    var d3JsonParents = sparqlController.getD3JsonParents('wd:Q21198','ComputerScience', sparqlJson )
+    sparqlController.fetchQuery(sparqlChildrenQuery).then((sparqlJson) => { 
+      const d3JsonChildren = sparqlController.getD3JsonChildren('wd:Q21198','ComputerScience', sparqlJson )
+      const graphNodesTogether = d3JsonParents["graphNodes"].concat(d3JsonChildren["graphNodes"])
+      const graphLinksTogether = d3JsonParents["graphLinks"].concat(d3JsonChildren["graphLinks"])
+      const graph = {
+	      graphNodes: graphNodesTogether,
+  	    graphLinks: graphLinksTogether
+      }
+      res.set('Content-Type', 'application/json');
+      res.send(graph);
+    });
   });
 
   

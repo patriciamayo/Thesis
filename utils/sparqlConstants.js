@@ -9,6 +9,12 @@ const sparqlParent = {
     usedBy: 'wdt:P1535'	
 }
 
+const sparqlChild = {
+    hasPart: 'wdt:P527',
+    followedBy: 'wdt:P156',
+    uses: 'wdt:P2283'
+}
+
 const sparqlParents = [
     {
         title: 'instanceOf',
@@ -36,15 +42,23 @@ const sparqlParents = [
     }
 ]
 
-const sparqlChild = {
-    hasPart: 'wdt:P527',
-    followedBy: 'wdt:P156',
-    uses: 'wdt:P2283'
-}
+const sparqlChildren = [
+    {
+        title: 'hasPart',
+        value: sparqlChild.hasPart
+    },
+    {
+        title: 'followedBy',
+        value: sparqlChild.followedBy
+    },
+    {
+        title: 'uses',
+        value: sparqlChild.uses
+    }
+]
 
 module.exports = {
-    sparqlParents,
     endpointUrl,
-    sparqlChild,
-    sparqlParent
+    sparqlParents,
+    sparqlChildren
 };
