@@ -11,7 +11,7 @@ router.get('/', function(req, res, next) {
   const wikiIdentifier = 'wd:Q21198'
   const wikiLabel = 'ComputerScience'
 
-  const deep = 1
+  const deep = 2
   
 
   const merge2GraphsTogether = (graph1, graph2) => {
@@ -85,39 +85,47 @@ function getGraph(branch, graphFirst, node) {
 
     recursiveChildren(branch, graph, node)
 
-    function recursiveChildren(branch, graph, node) {
-      if (branch == deep) {
-        console.log("leaf reached ============== " + node.label)
-        //console.log(graph)
-        resolve(graph)
-      } else {
-        //console.log("BRANCH: ==== " + branch)
-        //console.log("GRAPH: ==== ")
-        //console.log(graph)
 
-        const sparqlChildrenQuery = sparqlController.generateQuery(node, sparqlConstants.sparqlChildren)
-        sparqlController.fetchQuery(sparqlChildrenQuery).then((sparqlJson) => {
-          const d3JsonChildren = sparqlController.getD3JsonChildren(node, sparqlJson )
-          //console.log("what is this???")
-          const graphFinal = mergeArrayOfGraphs([graph, d3JsonChildren])
-          const childrenNodes = d3JsonChildren["graphNodes"]
-          var promises = childrenNodes.map(async (node) => {
-            const newGraph = recursiveChildren(branch + 1, graphFinal, node)
-            return newGraph
-          })
-          Promise.all(promises).then(function(results) {
-              console.log("for some reason results is undefined")
-              console.log(results)
-              return mergeArrayOfGraphs(results)
-          })
-          // const graphOfAllChildren = mergeArrayOfGraphs(childrenNodes.map(node => {
-          //   return recursiveChildren(branch + 1, graphFinal, node)
-          // }))
-          // return graphOfAllChildren
-        });
-      }
-    }
   })
+}
+
+function recursiveChildren(branch, graph, node) {
+  return new Promise(function(resolve,reject){
+  if (branch == deep) {
+    console.log("leaf reached Resolve promise ============== " + node.label)
+    console.log(graph)
+    resolve(graph)
+  } else {
+    console.log("BRANCH: ==== " + branch)
+    console.log("NODE: ==== " + node.label)
+    console.log("CURRENT GRAPH: ==== ")
+    console.log(graph)
+
+    const sparqlChildrenQuery = sparqlController.generateQuery(node, sparqlConstants.sparqlChildren)
+    sparqlController.fetchQuery(sparqlChildrenQuery).then((sparqlJson) => {
+      const d3JsonChildren = sparqlController.getD3JsonChildren(node, sparqlJson )
+      //console.log("what is this???")
+      const graphFinal = mergeArrayOfGraphs([graph, d3JsonChildren])
+      const childrenNodes = d3JsonChildren["graphNodes"]
+      var promises = childrenNodes.map(node => {
+        console.log("Open new promise for node " + node.label)
+        return recursiveChildren(branch + 1, graphFinal, node).then( graph => {
+          console.log("promise should be close here also now " + node.label)
+          return graph
+        })
+      })
+      Promise.all(promises).then(function(results) {
+          console.log("for some reason results dont work")
+          console.log(results)
+          resolve(mergeArrayOfGraphs(results))
+      })
+      // const graphOfAllChildren = mergeArrayOfGraphs(childrenNodes.map(node => {
+      //   return recursiveChildren(branch + 1, graphFinal, node)
+      // }))
+      // return graphOfAllChildren
+    });
+  }
+})
 }
 
 function mapChildrenNodes(childrenNodes) {
@@ -128,7 +136,7 @@ function mapChildrenNodes(childrenNodes) {
   })
 }
 
-  function recursiveChildren(branch, graph, node) {
+  function recursiveChildren2(branch, graph, node) {
     if (branch == deep) {
       console.log("leaf reached ============== " + node.label)
       console.log(graph)
@@ -179,7 +187,7 @@ function mapChildrenNodes(childrenNodes) {
     graphLinks: []
   }
   //const test =  
-  getGraph(0, graph, genesisNode).then(graph => {
+  recursiveChildren(0, graph, genesisNode).then(graph => {
     console.log("test is back ->>>>")
     console.log(graph)
     //const newTest = mergeArrayOfGraphs(graph)
