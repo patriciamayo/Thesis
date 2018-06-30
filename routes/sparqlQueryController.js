@@ -12,32 +12,37 @@ var fetchQuery = (sparqlQuery) => {
     return fetch( fullUrl, { headers } ).then( body => body.json() ).then( json => { return json;});
 };
 
-var generateQuery = (subjectIdentifier, subjectName, propertiesArray) => {
+var generateQuery = (node, propertiesArray) => {
+    const nodeId = node.id.split("/").pop()
     var selectQuery = ""
     var whereQuery = []
     propertiesArray.forEach(function(property) { 
         selectQuery += "?" + property.title + " ?" + property.title + "Label "
-        whereQuery.push(" { " + subjectIdentifier + " " + property.value + " ?" + property.title + " .} ")
+        whereQuery.push(" { wd:" + nodeId + " " + property.value + " ?" + property.title + " .} ")
     })
-    return `#` + subjectName + `
+    return `#` + node.label + `
     SELECT ` + selectQuery + ` WHERE {
       ` + whereQuery.join("UNION") + `
       SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
     }`
 }
 
-var getD3JsonChildren = (wikidataIdentifier, wikidataName, sparqlJson) => {
-    const genesisNode = new graphNode('http://www.wikidata.org/entity/' + wikidataIdentifier, wikidataName, 0)
-    var graphNodes = [genesisNode]
+var getD3JsonChildren = (sourceNode, sparqlJson) => {
+    //const genesisNode = new graphNode('http://www.wikidata.org/entity/' + wikidataIdentifier, wikidataName, 0)
+    var graphNodes = []
+    //console.log("getD3JsonChildren sparqlJson.results.bindings =======")
+    //console.log(sparqlJson.results.bindings)
     var graphLinks = []
     for ( const result of sparqlJson.results.bindings ) {
         const keyValues = Object.keys(result)
         const indexOfProperty = sparqlConstants.sparqlChildren.map(property => property.title).indexOf(keyValues[0]);
         const node = new graphNode(result[keyValues[0]].value, result[keyValues[1]].value, indexOfProperty + 1)
         graphNodes.push(node)
-        const link = new graphLink(genesisNode.id, node.id, keyValues[0])
+        const link = new graphLink(sourceNode.id, node.id, keyValues[0])
         graphLinks.push(link)
     }
+    //console.log("building the new graph with children =======")
+    //console.log({graphNodes, graphLinks})
     return {graphNodes, graphLinks}
 }
 
