@@ -6,13 +6,15 @@ const sparqlParent = {
     hasPartsOf: 'wdt:P2670',
     subclassOf: 'wdt:P279',
     follows: 'wdt:P155',
-    usedBy: 'wdt:P1535'	
+    usedBy: 'wdt:P1535',
+    basedOn: 'wdt:P144'
 }
 
 const sparqlChild = {
     hasPart: 'wdt:P527',
     followedBy: 'wdt:P156',
-    uses: 'wdt:P2283'
+    uses: 'wdt:P2283',
+    derivatesFrom: 'wdt:P4969'
 }
 
 const sparqlParents = [
@@ -39,6 +41,10 @@ const sparqlParents = [
     {
         title: 'usedBy',
         value: sparqlParent.usedBy
+    },
+    {
+        title: 'basedOn',
+        value:sparqlParent.basedOn
     }
 ]
 
@@ -54,6 +60,10 @@ const sparqlChildren = [
     {
         title: 'uses',
         value: sparqlChild.uses
+    },
+    {
+        title: 'derivatesFrom',
+        value: sparqlChild.derivatesFrom
     }
 ]
 

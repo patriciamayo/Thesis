@@ -6,6 +6,7 @@ const graphNode = require('./../models/graphNode')
 /* GET home page. */
 router.get('/wikiquery', function(req, res, next) {
   
+  console.log("calling api")
   const deep = req.query.deep || 2
   var id = req.query.id
   
