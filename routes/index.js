@@ -1,8 +1,10 @@
 var express = require('express');
 var router = express.Router();
+var cors = require('cors')
 const d3GraphsController = require('./d3GraphsController.js');
 const graphNode = require('./../models/graphNode')
 
+router.use(cors())
 /* GET home page. */
 router.get('/wikiquery', function(req, res, next) {
   
