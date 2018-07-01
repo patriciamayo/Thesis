@@ -19,15 +19,20 @@ const mergeArrayOfGraphs = (graphsArray) => {
     graphsArray.forEach(function(graph) { 
       tempGraph = merge2GraphsTogether(tempGraph, graph)
     })
-    // remove duplicates
-    var uniqueNodes = Array.from(new Set(tempGraph["graphNodes"]))
-    var uniqueLinks = Array.from(new Set(tempGraph["graphLinks"]))
-    return {
-      graphNodes: uniqueNodes,
-      graphLinks: uniqueLinks
-    }
+    return removeDuplicates(tempGraph)
 }
 
+const removeDuplicates = (graph) => {    
+    var uniqueLinks = Array.from(new Set(graph["graphLinks"]))
+
+    var uniqueNodes = graph["graphNodes"].filter((obj, pos, arr) => {
+        return arr.map(mapObj => mapObj['id']).indexOf(obj['id']) === pos;
+    })
+    return {
+        graphNodes: uniqueNodes,
+        graphLinks: uniqueLinks
+    }
+}
 
 var generateD3GraphRecursively = (maxDeep, branch, graph, node, type) => {
   return new Promise(function(resolve,reject){
