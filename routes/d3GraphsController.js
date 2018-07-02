@@ -66,6 +66,15 @@ var generateD3GraphRecursively = (maxDeep, branch, graph, node, type) => {
   })
 }
 
+var getEntityGraph = (id, group, position) => {
+    return new Promise(function(resolve,reject){
+        sparqlController.getEntityInfo(id).then( sparqlJson => {
+            resolve(helper.convertJsonToGraphNode(sparqlJson, id, group, position))
+        })
+    })
+}
+
 module.exports = {
+    getEntityGraph,
     generateD3GraphRecursively
 }

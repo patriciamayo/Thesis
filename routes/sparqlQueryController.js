@@ -19,7 +19,7 @@ var generateQuery = (node, propertiesArray) => {
     var selectQuery = ""
     var whereQuery = []
     propertiesArray.forEach(function(property) { 
-        selectQuery += "?" + property.title + " ?" + property.title + "Label "
+        selectQuery += "?" + property.title + " ?" + property.title + "Label " + " ?" + property.title + "Description "
         whereQuery.push(" { wd:" + nodeId + " " + property.value + " ?" + property.title + " .} ")
     })
     return `#` + node.label + `
@@ -29,7 +29,24 @@ var generateQuery = (node, propertiesArray) => {
     }`
 }
 
+var getEntityInfo = (id) => {
+    const url = "https://www.wikidata.org/w/api.php?action=wbgetentities&props=labels|descriptions&format=json&languages=en&ids="
+    return fetch( url + id ).then( body => body.json() ).then( json => { return json;});
+}
+
+var getCategoriesQuery = (category) => {
+    return `
+    SELECT ?out ?depth WHERE {
+        SERVICE mediawiki:categoryTree {
+          bd:serviceParam mediawiki:start <https://en.wikipedia.org/wiki/Category:Ducks> .
+          bd:serviceParam mediawiki:direction "Reverse" .
+          bd:serviceParam mediawiki:depth 5 .
+        }
+      } ORDER BY ASC(?depth)`
+}
+
 module.exports = {
     generateQueryForType,
     fetchQuery,
+    getEntityInfo
 }
