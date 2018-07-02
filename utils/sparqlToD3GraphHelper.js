@@ -1,11 +1,28 @@
 const graphNode = require('./../models/graphNode')
 const graphLink = require('./../models/graphLink')
+const graphCategoryItem = require('./../models/graphCategoryItem')
+const graphCategories = require('./../models/graphCategories')
 const sparqlConstants = require('./sparqlConstants.js');
+const sparqlController = require('./../routes/sparqlQueryController.js');
 
 const convertJsonToGraphNode = (sparqlJson, id, group, position) => {
     let label = sparqlJson.entities[id].labels.en.value
     let description = sparqlJson.entities[id].descriptions.en.value
     return new graphNode("http://www.wikidata.org/entity/" + id,label, description, group, position)
+}
+
+const convertJsonToGraphCategories = (sparqlJson, id) => {
+    const subcategories = sparqlJson.query.categorymembers.filter( member => member.title.indexOf('Category') >= 0 )
+    const pages = sparqlJson.query.categorymembers.filter( member => member.title.indexOf('Category') < 0 )
+    const graphSubcategories = []
+    const graphPages = []
+    for ( const subcategory of subcategories ) {
+        graphSubcategories.push(new graphCategoryItem(subcategory.pageid, subcategory.title))
+    }
+    for ( const page of pages ) {
+        graphPages.push(new graphCategoryItem(page.pageid, page.title))
+    }
+    return new graphCategories(id,graphSubcategories, graphPages)
 }
 
 const convertSparqlJsonToD3Graph = (sparqlJson, type, node) => {
@@ -52,6 +69,7 @@ var getD3JsonParents = (targetNode, sparqlJson) => {
 }
 
 module.exports = {
+    convertJsonToGraphCategories,
     convertJsonToGraphNode,
     convertSparqlJsonToD3Graph,
 }

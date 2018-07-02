@@ -35,18 +35,13 @@ var getEntityInfo = (id) => {
 }
 
 var getCategoriesQuery = (category) => {
-    return `
-    SELECT ?out ?depth WHERE {
-        SERVICE mediawiki:categoryTree {
-          bd:serviceParam mediawiki:start <https://en.wikipedia.org/wiki/Category:Ducks> .
-          bd:serviceParam mediawiki:direction "Reverse" .
-          bd:serviceParam mediawiki:depth 5 .
-        }
-      } ORDER BY ASC(?depth)`
+    const url = "https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmlimit=40&format=json&cmtype=subcat|page&cmtitle=Category:"
+    return fetch( url + category ).then( body => body.json() ).then( json => { return json;});
 }
 
 module.exports = {
     generateQueryForType,
     fetchQuery,
-    getEntityInfo
+    getEntityInfo,
+    getCategoriesQuery
 }

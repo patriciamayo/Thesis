@@ -1,6 +1,22 @@
 const sparqlController = require('./sparqlQueryController.js');
 const helper = require('./../utils/sparqlToD3GraphHelper.js');
 
+
+var getCategories = (graph) => {
+  const links = graph['graphLinks']
+  var categoriesFromGraph = links.filter(link => link.type == 'CommonCategory')
+  return new Promise(function(resolve,reject){
+    var promises = categoriesFromGraph.map(category => {
+      return sparqlController.getCategoriesQuery(category.source).then( sparqlJson => {
+        return helper.convertJsonToGraphCategories(sparqlJson, category.source)
+      })
+    })
+    Promise.all(promises).then(function(results) {
+        resolve(results)
+    })
+  })
+}
+
 const merge2GraphsTogether = (graph1, graph2) => {
     const graphNodesTogether = graph1["graphNodes"].concat(graph2["graphNodes"])
     const graphLinksTogether = graph1["graphLinks"].concat(graph2["graphLinks"])
@@ -74,7 +90,10 @@ var getEntityGraph = (id, group, position) => {
     })
 }
 
+
+
 module.exports = {
+    getCategories,
     getEntityGraph,
     generateD3GraphRecursively
 }
