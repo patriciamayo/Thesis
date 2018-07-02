@@ -48,7 +48,7 @@ const sparqlParents = [
         value:sparqlParent.basedOn
     },
     {
-        title: 'CommonCategoty',
+        title: 'CommonCategory',
         value: sparqlParent.category
     }
 ]
