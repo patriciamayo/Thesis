@@ -7,7 +7,8 @@ const sparqlParent = {
     subclassOf: 'wdt:P279',
     follows: 'wdt:P155',
     usedBy: 'wdt:P1535',
-    basedOn: 'wdt:P144'
+    basedOn: 'wdt:P144',
+    category: 'wdt:P373'
 }
 
 const sparqlChild = {
@@ -45,6 +46,10 @@ const sparqlParents = [
     {
         title: 'basedOn',
         value:sparqlParent.basedOn
+    },
+    {
+        title: 'CommonCategoty',
+        value: sparqlParent.category
     }
 ]
 

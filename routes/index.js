@@ -10,7 +10,7 @@ router.get('/wikiquery', function(req, res, next) {
   const deep = req.query.deep || 2
   var id = req.query.id
   
-  const genesisNode = new graphNode("http://www.wikidata.org/entity/" + id,"Mathematics", 0)
+  const genesisNode = new graphNode("http://www.wikidata.org/entity/" + id,"Mathematics", 0, "O")
   var graph = {
     graphNodes: [genesisNode],
     graphLinks: []
