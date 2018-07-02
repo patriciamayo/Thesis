@@ -3,18 +3,14 @@ const helper = require('./../utils/sparqlToD3GraphHelper.js');
 
 
 var getCategories = (graph) => {
-  //console.log(graph)
   const links = graph['graphLinks']
   var categoriesFromGraph = links.filter(link => link.type == 'CommonCategory')
   return new Promise(function(resolve,reject){
     var promises = categoriesFromGraph.map(category => {
-      console.log("analizing ... " + category.source)
       return sparqlController.getCategoriesQuery(category.source).then( sparqlJson => {
-        console.log(sparqlJson)
         return helper.convertJsonToGraphCategories(sparqlJson, category.source)
       })
     })
-    // when all new nodes have resolved their own graphs we merge them together and resolve the final promise
     Promise.all(promises).then(function(results) {
         resolve(results)
     })
