@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const d3GraphsController = require('./d3GraphsController.js');
+const wikipeidaController = require('./wikipediaController.js');
 const d3Graph = require('./../models/graphD3');
 
 /* GET home page. */
@@ -24,6 +25,12 @@ router.get('/wikiquery', function(req, res, next) {
       })
     })  
   })
+});
+
+/* GET home page. */
+router.get('/', function(req, res, next) {
+  console.log('hello we entered here')
+  wikipeidaController.getWikipedia()
 });
 
 module.exports = router;
