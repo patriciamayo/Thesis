@@ -45,12 +45,20 @@ var getWikipedia = (url) => {
                     currentSectionId = $(this).find('span').attr('id')
                 } 
             })
-            resolve(elements)
+            resolve({
+                wikidataID : getWikiDataID($),
+                toc: elements
+            })
         }).catch((err) => {
             console.log("Erroooor " + err);
             reject(err)
         });
     })
+}
+
+var getWikiDataID = ($) => {
+    var linktoWikidata = $('#t-wikibase').find('a').attr('href') || ""
+    return linktoWikidata.split('/').pop()
 }
 
 var getTableOfContents = ($) => {
