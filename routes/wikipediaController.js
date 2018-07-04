@@ -2,16 +2,20 @@ const rp = require('request-promise');
 const cheerio = require('cheerio');
 const wikiSection = require('../models/wikiSection')
 
-const options = {
-  uri: 'https://en.wikipedia.org/wiki/Ball',
-  transform: function (body) {
-    return cheerio.load(body);
-  }
-};
 
-var getWikipedia = () => {
-    rp(options)
-        .then(($) => {
+
+var getWikipedia = (url) => {
+    return new Promise(function(resolve,reject){ 
+
+        console.log(url)
+        const options = {
+            uri: url,
+            transform: function (body) {
+              return cheerio.load(body);
+            }
+        };
+
+        rp(options).then(($) => {
             var sections = getTableOfContents($)
             var elements = []
             var currentElement = ""
@@ -41,11 +45,12 @@ var getWikipedia = () => {
                     currentSectionId = $(this).find('span').attr('id')
                 } 
             })
-            //console.log(elements)
-        })
-        .catch((err) => {
+            resolve(elements)
+        }).catch((err) => {
             console.log("Erroooor " + err);
-    });
+            reject(err)
+        });
+    })
 }
 
 var getTableOfContents = ($) => {
@@ -66,7 +71,7 @@ var getAllLinksFromHTMLText = (text) => {
         // if title doesnt contain warning and link is not actually a citation
         if (title.indexOf('not exist') < 0 && link.indexOf('#cite') < 0) {
             links.push({
-                link: link,
+                link: 'https://en.wikipedia.org' + link,
                 title: title
             })
         }

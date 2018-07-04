@@ -28,9 +28,13 @@ router.get('/wikiquery', function(req, res, next) {
 });
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  console.log('hello we entered here')
-  wikipeidaController.getWikipedia()
+router.get('/page', function(req, res, next) {
+  var url = req.query.url
+  console.log("VAR is " + url) 
+  wikipeidaController.getWikipedia(url).then(links => {
+    res.set('Content-Type', 'application/json');
+    res.send(links)
+  }) 
 });
 
 module.exports = router;
