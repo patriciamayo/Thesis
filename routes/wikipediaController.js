@@ -1,5 +1,7 @@
 const rp = require('request-promise');
 const cheerio = require('cheerio');
+const wikiSection = require('../models/wikiSection')
+
 const options = {
   uri: 'https://en.wikipedia.org/wiki/Ball',
   transform: function (body) {
@@ -12,7 +14,12 @@ var getWikipedia = () => {
     rp(options)
         .then(($) => {
             console.log('answer back!!')
-            console.log($);
+            var test = $('div[class=toc]').html()
+            var sections = []
+            $('div[class=toc]').find('a').each(function(i, elem) {
+                sections.push(new wikiSection($(this).attr('href'), $(this).children().filter('.toctext').text(),  $(this).children().filter('.tocnumber').text()))
+            });
+            console.log(sections);
         })
         .catch((err) => {
             console.log("erroooor " + err);
