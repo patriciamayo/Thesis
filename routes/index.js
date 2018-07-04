@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const d3GraphsController = require('./d3GraphsController.js');
+const wikipeidaController = require('./wikipediaController.js');
 const d3Graph = require('./../models/graphD3');
 
 /* GET home page. */
@@ -24,6 +25,16 @@ router.get('/wikiquery', function(req, res, next) {
       })
     })  
   })
+});
+
+/* GET home page. */
+router.get('/page', function(req, res, next) {
+  var url = req.query.url
+  console.log("VAR is " + url) 
+  wikipeidaController.getWikipedia(url).then(links => {
+    res.set('Content-Type', 'application/json');
+    res.send(links)
+  }) 
 });
 
 module.exports = router;
