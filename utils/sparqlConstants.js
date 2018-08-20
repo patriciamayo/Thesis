@@ -8,7 +8,7 @@ const sparqlParent = {
     follows: 'wdt:P155',
     usedBy: 'wdt:P1535',
     basedOn: 'wdt:P144',
-    category: 'wdt:P373'
+    category: 'wdt:P910'
 }
 
 const sparqlChild = {

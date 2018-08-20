@@ -25,14 +25,14 @@ const convertJsonToGraphCategories = (sparqlJson, id) => {
     return new graphCategories(id,graphSubcategories, graphPages)
 }
 
-const convertSparqlJsonToD3Graph = (sparqlJson, type, node) => {
+const convertSparqlJsonToD3Graph = (sparqlJson, type, deepLevel, node) => {
     if (type == "children") {
-        return getD3JsonChildren(node,sparqlJson)
+        return getD3JsonChildren(node, deepLevel, sparqlJson)
     } 
-    return getD3JsonParents(node,sparqlJson)
+    return getD3JsonParents(node, deepLevel, sparqlJson)
 }
 
-var getD3JsonChildren = (sourceNode, sparqlJson) => {
+var getD3JsonChildren = (sourceNode, deepLevel, sparqlJson) => {
     var graphNodes = []
     var graphLinks = []
     for ( const result of sparqlJson.results.bindings ) {
@@ -42,7 +42,7 @@ var getD3JsonChildren = (sourceNode, sparqlJson) => {
             description = result[keyValues[2]].value
         }
         const indexOfProperty = sparqlConstants.sparqlChildren.map(property => property.title).indexOf(keyValues[0]);
-        const node = new graphNode(result[keyValues[0]].value, result[keyValues[1]].value, description, indexOfProperty + 1, "children")
+        const node = new graphNode(result[keyValues[0]].value, result[keyValues[1]].value, description, indexOfProperty + 1, deepLevel)
         graphNodes.push(node)
         const link = new graphLink(sourceNode.id, node.id, keyValues[0])
         graphLinks.push(link)
@@ -50,7 +50,7 @@ var getD3JsonChildren = (sourceNode, sparqlJson) => {
     return {graphNodes, graphLinks}
 }
 
-var getD3JsonParents = (targetNode, sparqlJson) => {
+var getD3JsonParents = (targetNode, deepLevel, sparqlJson) => {
     var graphNodes = []
     var graphLinks = []
     for ( const result of sparqlJson.results.bindings ) {
@@ -60,7 +60,7 @@ var getD3JsonParents = (targetNode, sparqlJson) => {
             description = result[keyValues[2]].value
         }
         const indexOfProperty = sparqlConstants.sparqlParents.map(property => property.title).indexOf(keyValues[0]);
-        const node = new graphNode(result[keyValues[0]].value, result[keyValues[1]].value, description, indexOfProperty + 6, "parent")
+        const node = new graphNode(result[keyValues[0]].value, result[keyValues[1]].value, description, indexOfProperty + 6, deepLevel*(-1))
         graphNodes.push(node)
         const link = new graphLink(node.id, targetNode.id, keyValues[0])
         graphLinks.push(link)

@@ -3,6 +3,7 @@ var router = express.Router();
 const d3GraphsController = require('./d3GraphsController.js');
 const wikipeidaController = require('./wikipediaController.js');
 const d3Graph = require('./../models/graphD3');
+const analytics = require('./analyticsController.js');
 
 /* GET home page. */
 router.get('/wikiquery', function(req, res, next) {
@@ -10,7 +11,7 @@ router.get('/wikiquery', function(req, res, next) {
   const deep = req.query.deep || 2
   var id = req.query.id
   
-  d3GraphsController.getEntityGraph(id, 0, "O").then( genesisNode => {
+  d3GraphsController.getEntityGraph(id, 0, 0).then( genesisNode => {
     var graph = {
       graphNodes: [genesisNode],
       graphLinks: []
@@ -18,9 +19,14 @@ router.get('/wikiquery', function(req, res, next) {
     d3GraphsController.generateD3GraphRecursively(deep, 0, graph, genesisNode, "parent").then(graph => {
       d3GraphsController.generateD3GraphRecursively(deep, 0, graph, genesisNode, "children").then(graph => {
         d3GraphsController.getCategories(graph).then(categories => {
-          const finalGraph = new d3Graph(graph['graphNodes'], graph['graphLinks'], categories)
-          res.set('Content-Type', 'application/json');
-          res.send(finalGraph)
+          var finalGraph = new d3Graph(graph['graphNodes'], graph['graphLinks'], categories)
+          console.log("Calling analytics")
+          analytics.getAllClaimsWithoutFilter(graph['graphNodes']).then(totalClaimsAvoided => {
+            console.log(totalClaimsAvoided)
+            finalGraph.claimsUnfiltered = totalClaimsAvoided
+            res.set('Content-Type', 'application/json');
+            res.send(finalGraph)
+          })
         })
       })
     })  

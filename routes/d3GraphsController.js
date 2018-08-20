@@ -59,7 +59,7 @@ var generateD3GraphRecursively = (maxDeep, branch, graph, node, type) => {
       const sparqlQuery = sparqlController.generateQueryForType(type, node)
       // Fetch data from wikidata with sparql query
       sparqlController.fetchQuery(sparqlQuery).then((sparqlJsonResult) => {
-        const d3GraphWithNewNodes = helper.convertSparqlJsonToD3Graph(sparqlJsonResult, type, node)
+        const d3GraphWithNewNodes = helper.convertSparqlJsonToD3Graph(sparqlJsonResult, type, branch+1, node)
         // The current node doesn't have more children/parents so we can resolve with the current graph
         if (d3GraphWithNewNodes["graphNodes"].length == 0) {
           resolve(graph)
@@ -89,8 +89,6 @@ var getEntityGraph = (id, group, position) => {
         })
     })
 }
-
-
 
 module.exports = {
     getCategories,
