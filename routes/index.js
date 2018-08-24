@@ -20,7 +20,6 @@ router.get('/wikiquery', function(req, res, next) {
       d3GraphsController.generateD3GraphRecursively(deep, 0, graph, genesisNode, "children").then(graph => {
         d3GraphsController.getCategories(graph).then(categories => {
           var finalGraph = new d3Graph(graph['graphNodes'], graph['graphLinks'], categories)
-          console.log("Calling analytics")
           analytics.getFilterUnfilterStats(graph['graphNodes'], graph['graphLinks']).then(stats => {
             finalGraph.analytics = stats
             res.set('Content-Type', 'application/json');

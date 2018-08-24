@@ -33,7 +33,14 @@ var getFilterUnfilterStats = (graphNodes, graphLinks) => {
                 }));
                 claimsKeys.forEach(claimKey => {
                     var claimValues = entity.claims[claimKey].map(claimValue => {
-                        return claimValue.mainsnak.datavalue.value.id
+                        if (claimValue.mainsnak.hasOwnProperty('datavalue')) {
+                            if (claimValue.mainsnak.datavalue.hasOwnProperty('value')) {
+                                if (claimValue.mainsnak.datavalue.value.hasOwnProperty('id')) {
+                                    return claimValue.mainsnak.datavalue.value.id
+                             }
+                            }
+                        }
+                        return ""
                     })
                     allUnfilteredClaimValues = allUnfilteredClaimValues.concat(claimValues.filter(function(claimValue) {
                         return allUnfilteredClaimValues.indexOf(claimValue) < 0;

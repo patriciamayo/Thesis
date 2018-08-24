@@ -4,11 +4,12 @@ const helper = require('./../utils/sparqlToD3GraphHelper.js');
 
 var getCategories = (graph) => {
   const links = graph['graphLinks']
-  var categoriesFromGraph = links.filter(link => link.type == 'CommonCategory')
+  const nodes = graph['graphNodes']
+  var categoriesFromGraph = nodes.filter(node => node.label.indexOf('Category:') !== -1)
   return new Promise(function(resolve,reject){
     var promises = categoriesFromGraph.map(category => {
-      return sparqlController.getCategoriesQuery(category.source).then( sparqlJson => {
-        return helper.convertJsonToGraphCategories(sparqlJson, category.source)
+      return sparqlController.getCategoriesQuery(category.label).then( sparqlJson => {
+        return helper.convertJsonToGraphCategories(sparqlJson, category.label)
       })
     })
     Promise.all(promises).then(function(results) {

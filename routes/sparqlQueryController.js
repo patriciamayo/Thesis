@@ -35,7 +35,7 @@ var getEntityInfo = (id) => {
 }
 
 var getCategoriesQuery = (category) => {
-    const url = "https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmlimit=40&format=json&cmtype=subcat|page&cmtitle=Category:"
+    const url = "https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmlimit=40&format=json&cmtype=subcat|page&cmtitle="
     return fetch( url + category ).then( body => body.json() ).then( json => { return json;});
 }
 
