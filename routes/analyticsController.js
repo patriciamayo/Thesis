@@ -2,7 +2,6 @@ const fetch = require("node-fetch");
 
 var fetchClaims = (ids) => {
     const wikidataAPI = "https://www.wikidata.org/w/api.php?action=wbgetentities&props=claims&languages=en&format=json&ids="
-    console.log("url => " + wikidataAPI + ids)
     return fetch(wikidataAPI + ids).then( body => body.json() ).then( json => { return json;});
 };
 
@@ -10,7 +9,7 @@ var onlyUnique = (value, index, self) => {
     return self.indexOf(value) === index;
 }
 
-var getAllClaimsWithoutFilter = (graphNodes, graphLinks) => {
+var getFilterUnfilterStats = (graphNodes, graphLinks) => {
     return new Promise(function(resolve,reject){
         var analytics = {}
         // get id for each node to call all its properties
@@ -24,34 +23,44 @@ var getAllClaimsWithoutFilter = (graphNodes, graphLinks) => {
         //var propiedadesSinFiltrado = 0
         var nodosSinFiltrado = 0
         fetchClaims(nodeIds.join('|')).then((claimsJson) => {
-            var allClaims = []
+            var allUnfilteredClaims = []
+            var allUnfilteredClaimValues = []
             nodeIds.forEach(id => {
-                // var entity = claimsJson.entities[id]
-                // var claims = Object.keys(entity.claims)
-                // propiedadesSinFiltrado = propiedadesSinFiltrado + claims.filter(onlyUnique).length
-                // var claimValues = claims.map( claim => {
-
-                // })
-                // claims.forEach(claim => {
-                //     claim
-                //     nodosSinFiltrado = nodosSinFiltrado 
-                // });
-                //totalClaims = totalClaims + Object.keys(entity.claims).length
                 var entity = claimsJson.entities[id]
                 var claimsKeys = Object.keys(entity.claims)
-                allClaims = allClaims.concat(claimsKeys.filter(function (claimKey) {
-                    return allClaims.indexOf(claimKey) < 0;
+                allUnfilteredClaims = allUnfilteredClaims.concat(claimsKeys.filter(function (claimKey) {
+                    return allUnfilteredClaims.indexOf(claimKey) < 0;
                 }));
+                claimsKeys.forEach(claimKey => {
+                    var claimValues = entity.claims[claimKey].map(claimValue => {
+                        if (claimValue.mainsnak.hasOwnProperty('datavalue')) {
+                            if (claimValue.mainsnak.datavalue.hasOwnProperty('value')) {
+                                if (claimValue.mainsnak.datavalue.value.hasOwnProperty('id')) {
+                                    return claimValue.mainsnak.datavalue.value.id
+                             }
+                            }
+                        }
+                        return ""
+                    })
+                    allUnfilteredClaimValues = allUnfilteredClaimValues.concat(claimValues.filter(function(claimValue) {
+                        return allUnfilteredClaimValues.indexOf(claimValue) < 0;
+                    }))
+                });
             });
 
-            analytics.nodosFiltrados = graphNodes.length
-            analytics.tiposDeEnlaceFiltrados = linkTypes.filter(onlyUnique).length
-            analytics.tiposDeEnlaceSinFiltrado = allClaims.length
-            resolve(propiedadesSinFiltrado)
+            console.log("analytics.filteredNodes => " + graphNodes.length)
+            console.log("analytics.unfilteredNodes => " + allUnfilteredClaimValues.length)
+            console.log("analytics.filteredLinkTypes => " + linkTypes.filter(onlyUnique).length)
+            console.log("analytics.unfilteredLinkTypes => " + allUnfilteredClaims.length)
+            analytics.filteredNodes = graphNodes.length
+            analytics.unfilteredNodes = allUnfilteredClaimValues.length
+            analytics.filteredLinkTypes = linkTypes.filter(onlyUnique).length
+            analytics.unfilteredLinkTypes = allUnfilteredClaims.length
+            resolve(analytics)
         })
     })
 }
 
 module.exports = {
-    getAllClaimsWithoutFilter
+    getFilterUnfilterStats
 }
