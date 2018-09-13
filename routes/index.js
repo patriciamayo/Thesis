@@ -41,4 +41,17 @@ router.get('/page', function(req, res, next) {
   }) 
 });
 
+
+/* GET home page. */
+router.get('/entity', function(req, res, next) {
+  var url = req.query.url
+  var title = url.split("/").pop()
+  wikipeidaController.getWikidataIDByQuery(title).then(wikidataID => {
+    d3GraphsController.getEntityGraph(wikidataID, 2, 1).then( nodeEntity => {
+      res.set('Content-Type', 'application/json');
+      res.send(nodeEntity)
+    })
+  })
+});
+
 module.exports = router;

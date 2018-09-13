@@ -1,5 +1,6 @@
 const rp = require('request-promise');
 const cheerio = require('cheerio');
+const fetch = require("node-fetch");
 const wikiSection = require('../models/wikiSection')
 
 
@@ -61,6 +62,22 @@ var getWikiDataID = ($) => {
     return linktoWikidata.split('/').pop()
 }
 
+var getWikidataIDByQuery = (title) => {
+    console.log("trying to call query " + title)
+    const apiURL = "https://en.wikipedia.org/w/api.php?action=query&prop=pageprops&ppprop=wikibase_item&format=json&titles="
+    console.log("calling url " + apiURL + title)
+    return fetch( apiURL + title ).then( body => body.json() ).then( json => {
+        console.log("answer arrived " + json)
+        var pages = json.query.pages
+        console.log(pages)
+        console.log(Object.keys(pages))
+        var pageKey = Object.keys(pages)[0]
+        console.log(pageKey)
+        console.log(pages[pageKey].pageprops.wikibase_item)
+        return pages[pageKey].pageprops.wikibase_item
+    });
+}
+
 var getTableOfContents = ($) => {
     var sections = []
     sections.push(new wikiSection('#', "Extract" , 0))
@@ -88,5 +105,6 @@ var getAllLinksFromHTMLText = (text) => {
 }
 
 module.exports = {
-    getWikipedia
+    getWikipedia,
+    getWikidataIDByQuery
 }
